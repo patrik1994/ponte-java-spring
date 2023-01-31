@@ -6,25 +6,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.List;
 
 @Service
 public class ImageStore {
-    private FileUploadRepository fileUploadRepository;
+    private final FileUploadRepository fileUploadRepository;
+    private final SignService signService;
 
-    public ImageStore(FileUploadRepository fileUploadRepository) {
+    public ImageStore(FileUploadRepository fileUploadRepository, SignService signService) {
         this.fileUploadRepository = fileUploadRepository;
+        this.signService = signService;
     }
 
     public void saveToDb (MultipartFile file) {
         FileUpload image = new FileUpload();
         try {
+            byte[] signed = signService.createDigitalSignature(file.getBytes());
+
             image.setFileData(file.getBytes());
             image.setFileType(file.getContentType());
             image.setFileName(file.getOriginalFilename());
             image.setSize(file.getSize());
+            image.setDigitalSignature(signService.encodeBase64(signed));
             fileUploadRepository.save(image);
-        } catch (IOException ex) {
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
             ex.printStackTrace();
         }
     }

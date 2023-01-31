@@ -1,12 +1,21 @@
 package hu.ponte.hr;
 
+import hu.ponte.hr.services.SignService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * @author zoltan
@@ -15,6 +24,9 @@ import java.util.Map;
 @SpringBootTest()
 public class SignTest
 {
+	@Autowired
+	SignService signService;
+
 	Map<String, String> files = new LinkedHashMap<String, String>() {
 		{
 			put("cat.jpg","XYZ+wXKNd3Hpnjxy4vIbBQVD7q7i0t0r9tzpmf1KmyZAEUvpfV8AKQlL7us66rvd6eBzFlSaq5HGVZX2DYTxX1C5fJlh3T3QkVn2zKOfPHDWWItdXkrccCHVR5HFrpGuLGk7j7XKORIIM+DwZKqymHYzehRvDpqCGgZ2L1Q6C6wjuV4drdOTHps63XW6RHNsU18wHydqetJT6ovh0a8Zul9yvAyZeE4HW7cPOkFCgll5EZYZz2iH5Sw1NBNhDNwN2KOxrM4BXNUkz9TMeekjqdOyyWvCqVmr5EgssJe7FAwcYEzznZV96LDkiYQdnBTO8jjN25wlnINvPrgx9dN/Xg==");
@@ -24,9 +36,33 @@ public class SignTest
 	};
 
 	@Test
-	public void test_01() {
+	public void test_01() throws Exception {
+		if (signService == null) fail("failed to set up signService");
 
+		for (Map.Entry<String, String> entry : files.entrySet()) {
+			URL uri = this.getClass().getClassLoader().getResource("images/" + entry.getKey());
+			Path path = Paths.get(uri.toURI());
+			byte[] input = Files.readAllBytes(path);
+
+			byte[] signed = signService.createDigitalSignature(input);
+			String encodedSigned = new String(signService.encodeBase64(signed));
+			encodedSigned = encodedSigned.replace("\r\n", "");
+
+			assertEquals(encodedSigned, entry.getValue());
+		}
 	}
 
+	@Test
+	public void verifySignature() throws Exception {
+		if (signService == null) fail("failed to set up signService");
+
+		URL uri = this.getClass().getClassLoader().getResource("images/cat.jpg");
+		Path path = Paths.get(uri.toURI());
+		byte[] input = Files.readAllBytes(path);
+
+		byte[] signed = signService.createDigitalSignature(input);
+
+		assertTrue(signService.verifyDigitalSignature(input, signed));
+	}
 
 }

@@ -17,7 +17,9 @@ public class FileUpload {
     private String fileName;
     private String fileType;
     private long size;
-    private String digitalSign;
+
+    @Lob
+    private byte[] digitalSignature;
 
     @Lob
     private byte[] fileData;
