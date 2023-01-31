@@ -16,8 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/file")
 public class UploadController
 {
-    @Getter
-    private ImageStore imageStore;
+    private final ImageStore imageStore;
 
     public UploadController(ImageStore imageStore) {
         this.imageStore = imageStore;

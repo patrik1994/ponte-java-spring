@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("api/images")
 public class ImagesController {
 
-    private ImageStore imageStore;
+    private final ImageStore imageStore;
 
     public ImagesController(ImageStore imageStore) {
         this.imageStore = imageStore;
@@ -29,7 +29,7 @@ public class ImagesController {
 
     @GetMapping("meta")
     public List<ImageMeta> listImages() {
-		List<ImageMeta> images = new ArrayList<>();
+        List<ImageMeta> images = new ArrayList<>();
         List<FileUpload> uploadedFiles = imageStore.listFiles();
 
         if (uploadedFiles == null || uploadedFiles.isEmpty()) {
