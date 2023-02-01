@@ -20,6 +20,7 @@
             this.myDropzone = new Dropzone(this.$refs.dz as HTMLElement, {
                 uploadMultiple:false,
                 clickable:true,
+                maxFilesize: 2.0,
                 addRemoveLinks:true,
                 url: '/api/file/post',
             });
