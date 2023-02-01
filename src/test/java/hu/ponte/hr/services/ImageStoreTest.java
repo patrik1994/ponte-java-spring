@@ -23,7 +23,7 @@ class ImageStoreTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        imageStore = new ImageStore(fileUploadRepository);
+        imageStore = new ImageStore(fileUploadRepository, null);
     }
 
     @Test

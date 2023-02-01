@@ -42,7 +42,7 @@ public class ImagesController {
                                                  .name(file.getFileName())
                                                  .mimeType(file.getFileType())
                                                  .size(file.getSize())
-                                                 .digitalSign("")
+                                                 .digitalSign(new String (file.getDigitalSignature()))
                                                  .build();
             images.add(image);
         }
