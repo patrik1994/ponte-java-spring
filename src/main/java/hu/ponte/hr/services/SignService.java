@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -33,6 +32,13 @@ public class SignService {
         initPublicKey();
     }
 
+    /**
+     * Loads the private key (PKCS8 format) from file system and assign it to the privateKey class attribute.
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
     private void initPrivateKey() throws URISyntaxException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         URL uri = this.getClass().getClassLoader().getResource(KEY_FILES_LOCATION + PRIVATE_KEY_FILENAME);
         byte[] input = Files.readAllBytes(Paths.get(uri.toURI()));
@@ -43,6 +49,13 @@ public class SignService {
         this.privateKey = kf.generatePrivate(spec);
     }
 
+    /**
+     * Loads the public key from file system and assign it to the publicKey class attribute.
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
+     */
     private void initPublicKey() throws URISyntaxException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         URL uri = this.getClass().getClassLoader().getResource(KEY_FILES_LOCATION + PUBLIC_KEY_FILENAME);
         byte[] input = Files.readAllBytes(Paths.get(uri.toURI()));
@@ -52,6 +65,14 @@ public class SignService {
         this.publicKey = kf.generatePublic(spec);
     }
 
+    /**
+     * Creates the digital signature for the input using the private key.
+     * @param input
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws SignatureException
+     */
     public byte[] createDigitalSignature(byte[] input) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance(SIGNING_ALGORITHM);
         signature.initSign(privateKey);
@@ -64,6 +85,13 @@ public class SignService {
         return Base64.getMimeEncoder().encode(input);
     }
 
+    /**
+     * Verifies that the digital signature is valid or not based on the signature, input and the public key.
+     * @param input
+     * @param signatureToVerify
+     * @return
+     * @throws Exception
+     */
     public boolean verifyDigitalSignature(byte[] input, byte[] signatureToVerify) throws Exception {
         Signature signature = Signature.getInstance(SIGNING_ALGORITHM);
         signature.initVerify(publicKey);
