@@ -28,9 +28,6 @@ public class UploadController
         if (file == null) {
             log.error("error while uploading file, the file is empty");
             throw (new InvalidFileException("file is empty"));
-        } else if ( file.getSize() > 2*1024*1024) {
-            log.error("file is greater than 2 MB, can't upload it " + file.getName());
-            throw (new InvalidFileException("file is larger than 2 MB"));
         } else {
             imageStore.saveToDb(file);
             return "ok";
